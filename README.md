@@ -52,7 +52,7 @@ that does not retry indefinitely.
 ### Phase 1 — GitHub repo processing
 
 Workers claim repositories from the coordinator queue (seeded from `input_data/repos_found.txt`).
-Each worker shallow-clones the repo to a tmpfs ramdisk, extracts `.ts`/`.mts`/`.cts` files,
+Each worker shallow-clones the repo to a tmpfs ramdisk, extracts files by defined env var extension,
 applies quality filters, formats them as FIM samples, and reports back. Use the built-in
 **Repo Scanner** utility (`GET /queries-gen`) to populate the repo list via GitHub search before
 starting this phase.

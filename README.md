@@ -97,6 +97,7 @@ See each subproject's README for setup, configuration, and API reference.
    `input_data/repos_found.txt` to be written
 3. **Start workers** — see [`llm-scraping-worker/README.md`](llm-scraping-worker/README.md)
 4. **Monitor** — open `http://<coordinator>:3981` for the real-time fleet dashboard
-5. **Collect output** — when all phases complete, the coordinator uploads `data/final_dataset.tar.zst`
-   and self-terminates
+5. **Collect output** — when all phases complete, the Final Merger worker uploads the complete dataset
+   to the coordinator (`data3/final_dataset.zip`); the coordinator sets fleet state to `done` and
+   the file is available for download via `GET /merge/download_final`
 

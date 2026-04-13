@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta content="width=device-width, initial-scale=1.0" name="viewport">
+	<title>Reset — Dataset Coordinator</title>
+	<link rel="stylesheet" href="/static/reset-dashboard.css">
+	<script src="/static/theme.js"></script>
+</head>
+<body>
+
+<header>
+	<div class="logo">// reset</div>
+	<nav class="nav">
+		<a class="nav-link" href="/">overview</a>
+		<a class="nav-link" href="/redis">redis</a>
+		<a class="nav-link" href="/queries-gen">repo scanner</a>
+		<a class="nav-link active" href="/reset">reset</a>
+	</nav>
+	<div>
+		<button class="theme-toggle" id="theme-toggle" onclick="__toggleTheme()" title="Toggle theme">&#9728;</button>
+	</div>
+</header>
+
+<main>
+	<div class="page-title">reset operations</div>
+
+	<!-- Reset all data -->
+	<div class="reset-card danger">
+		<div class="reset-card-header">
+			<div>
+				<div class="reset-card-title">reset all data</div>
+				<div class="reset-card-desc">
+					Wipes <strong>all</strong> Redis state and re-seeds from scratch. Use this to start a completely fresh run.
+					<ul>
+						<li>Deletes all repos (pending, assigned, done) and re-seeds from input_data/repos_found.txt</li>
+						<li>Deletes all stack tasks (pending, assigned, done, problematic) and re-seeds</li>
+						<li>Clears all worker stats and heartbeats</li>
+						<li>Unchecks all dashboard checkboxes (auto-advance, phase enables, shared-fs)</li>
+					</ul>
+				</div>
+			</div>
+			<button class="btn btn-danger" id="btn-reset-all">reset all</button>
+		</div>
+	</div>
+
+	<!-- Reset stack tasks only -->
+	<div class="reset-card warning">
+		<div class="reset-card-header">
+			<div>
+				<div class="reset-card-title">reset stack tasks</div>
+				<div class="reset-card-desc">
+					Wipes <strong>all stack state</strong> (pending, assigned, done, problematic) and re-seeds.
+					Use this to restart stack tasks.
+					<ul>
+						<li>Repos are <strong>not affected</strong></li>
+						<li>Worker stats are <strong>not affected</strong></li>
+					</ul>
+				</div>
+			</div>
+			<button class="btn btn-warning" id="btn-reset-stack">reset stack</button>
+		</div>
+	</div>
+
+	<!-- Reset problematic stack tasks -->
+	<div class="reset-card warning">
+		<div class="reset-card-header">
+			<div>
+				<div class="reset-card-title">reset problematic stack tasks</div>
+				<div class="reset-card-desc">
+					Moves all <strong>problematic</strong> stack tasks back into the pending queue so they can be retried.
+					Does not touch repos or worker stats.
+				</div>
+			</div>
+			<button class="btn btn-warning" id="btn-reset-problematic">retry problematic</button>
+		</div>
+	</div>
+
+	<!-- Retry problematic repos (sequential) -->
+	<div class="reset-card warning">
+		<div class="reset-card-header">
+			<div>
+				<div class="reset-card-title">retry problematic repos</div>
+				<div class="reset-card-desc">
+					Retries all <strong>problematic repos</strong> one at a time — dispatches one repo, waits for the
+					worker to report it done or failed, then dispatches the next.
+					Does not touch stack tasks or worker stats.
+				</div>
+			</div>
+			<button class="btn btn-warning" id="btn-reset-repos-problematic">retry repos</button>
+		</div>
+	</div>
+
+	<!-- Reset worker names -->
+	<div class="reset-card">
+		<div class="reset-card-header">
+			<div>
+				<div class="reset-card-title" style="color:var(--blue)">reset worker names</div>
+				<div class="reset-card-desc">
+					Clears the registered name for all workers. Names will be re-registered automatically on next worker startup.
+					All other worker stats, repos, and stack data are <strong>not affected</strong>.
+				</div>
+			</div>
+			<button class="btn btn-blue" id="btn-reset-worker-names">reset names</button>
+		</div>
+	</div>
+
+	<!-- Per-phase reset row -->
+	<div class="section-label">reset by phase</div>
+	<div class="phase-row">
+
+		<!-- Phase 3: Merge -->
+		<div class="phase-card danger">
+			<div class="phase-card-title">phase 3 — merge</div>
+			<div class="phase-card-desc">
+				Wipes <strong>all</strong> merge state (ready node IDs, status, assigned nodes, done nodes, shard progress),
+				stops the fleet, and deletes partial/final dataset files from disk.
+				Stack and repos are not affected.
+			</div>
+			<button class="btn btn-danger" id="btn-phase-merge">reset merge phase</button>
+		</div>
+
+		<!-- Phase 2: Stack -->
+		<div class="phase-card danger">
+			<div class="phase-card-title">phase 2 — stack</div>
+			<div class="phase-card-desc">
+				Wipes <strong>all</strong> stack data (pending, assigned, done, problematic) and re-seeds from scratch.
+				Repos are not affected.
+			</div>
+			<button class="btn btn-danger" id="btn-phase-stack">reset stack phase</button>
+		</div>
+
+		<!-- Phase 1: Repos -->
+		<div class="phase-card info">
+			<div class="phase-card-title">phase 1 — repos</div>
+			<div class="phase-card-desc">
+				Wipes <strong>all</strong> repo data (pending, assigned, done) and re-seeds from input_data/repos_found.txt.
+				Stack is not affected.
+			</div>
+			<button class="btn btn-blue" id="btn-phase-repos">reset repos phase</button>
+		</div>
+
+	</div>
+</main>
+
+<!-- Modal: reset all -->
+<div class="modal-overlay" id="modal-all">
+	<div class="modal danger">
+		<div class="modal-icon">⚠</div>
+		<div class="modal-title">reset all data?</div>
+		<div class="modal-body">
+			This will <strong>permanently delete</strong> all scraped repos, stack tasks, and worker stats from Redis,
+			then re-seed from defaults.<br><br>
+			This action <strong>cannot be undone</strong>.
+		</div>
+		<div class="modal-actions">
+			<button class="btn btn-cancel" id="cancel-all">cancel</button>
+			<button class="btn btn-danger" id="confirm-all">yes, reset everything</button>
+		</div>
+	</div>
+</div>
+
+<!-- Modal: reset stack -->
+<div class="modal-overlay" id="modal-stack">
+	<div class="modal warning">
+		<div class="modal-icon">↺</div>
+		<div class="modal-title">reset stack tasks?</div>
+		<div class="modal-body">
+			In-flight and problematic stack state will be cleared and re-seeded. Workers that already completed their shard are
+			<strong>skipped</strong>.<br><br>
+			Repos, worker stats, and already-done stack tasks are <strong>not affected</strong>.
+		</div>
+		<div class="modal-actions">
+			<button class="btn btn-cancel" id="cancel-stack">cancel</button>
+			<button class="btn btn-warning" id="confirm-stack">yes, reset stack</button>
+		</div>
+	</div>
+</div>
+
+<!-- Modal: retry repos problematic (sequential) -->
+<div class="modal-overlay" id="modal-repos-problematic">
+	<div class="modal warning">
+		<div class="modal-icon">↺</div>
+		<div class="modal-title">retry problematic repos?</div>
+		<div class="modal-body">
+			Problematic repos will be retried <strong>one at a time</strong>. The coordinator dispatches one repo,
+			waits for the worker to report it done or failed, then dispatches the next.<br><br>
+			Worker stats and all other data are <strong>not affected</strong>.
+		</div>
+		<div class="modal-actions">
+			<button class="btn btn-cancel" id="cancel-repos-problematic">cancel</button>
+			<button class="btn btn-warning" id="confirm-repos-problematic">yes, retry repos</button>
+		</div>
+	</div>
+</div>
+
+<!-- Modal: reset problematic -->
+<div class="modal-overlay" id="modal-problematic">
+	<div class="modal warning">
+		<div class="modal-icon">↺</div>
+		<div class="modal-title">retry problematic tasks?</div>
+		<div class="modal-body">
+			All problematic stack tasks will be moved back to the pending queue and retried by workers.<br><br>
+			Worker stats and all other data are <strong>not affected</strong>.
+		</div>
+		<div class="modal-actions">
+			<button class="btn btn-cancel" id="cancel-problematic">cancel</button>
+			<button class="btn btn-warning" id="confirm-problematic">yes, re-queue tasks</button>
+		</div>
+	</div>
+</div>
+
+<!-- Modal: phase merge -->
+<div class="modal-overlay" id="modal-phase-merge">
+	<div class="modal danger">
+		<div class="modal-icon">⚠</div>
+		<div class="modal-title">reset merge phase?</div>
+		<div class="modal-body">
+			This will delete <strong>all</strong> merge data — including node status, shard progress, and done records —
+			stop the fleet, and delete any partial/final dataset files from disk.<br><br>
+			Stack and repos are <strong>not affected</strong>. This action <strong>cannot be undone</strong>.
+		</div>
+		<div class="modal-actions">
+			<button class="btn btn-cancel" id="cancel-phase-merge">cancel</button>
+			<button class="btn btn-danger" id="confirm-phase-merge">yes, reset merge phase</button>
+		</div>
+	</div>
+</div>
+
+<!-- Modal: phase stack -->
+<div class="modal-overlay" id="modal-phase-stack">
+	<div class="modal danger">
+		<div class="modal-icon">⚠</div>
+		<div class="modal-title">reset stack phase?</div>
+		<div class="modal-body">
+			This will delete <strong>all</strong> stack data — including completed batches — and re-seed from scratch.<br><br>
+			Repos are <strong>not affected</strong>. This action <strong>cannot be undone</strong>.
+		</div>
+		<div class="modal-actions">
+			<button class="btn btn-cancel" id="cancel-phase-stack">cancel</button>
+			<button class="btn btn-danger" id="confirm-phase-stack">yes, reset stack phase</button>
+		</div>
+	</div>
+</div>
+
+<!-- Modal: phase repos -->
+<div class="modal-overlay" id="modal-phase-repos">
+	<div class="modal" style="border-color:#1e40af">
+		<div class="modal-icon">↺</div>
+		<div class="modal-title" style="color:var(--blue)">reset repos phase?</div>
+		<div class="modal-body">
+			All repo data (pending, assigned, done) will be wiped and re-seeded from input_data/repos_found.txt.<br><br>
+			Stack is <strong>not affected</strong>.
+		</div>
+		<div class="modal-actions">
+			<button class="btn btn-cancel" id="cancel-phase-repos">cancel</button>
+			<button class="btn btn-blue" id="confirm-phase-repos">yes, reset repos phase</button>
+		</div>
+	</div>
+</div>
+
+<!-- Modal: reset worker names -->
+<div class="modal-overlay" id="modal-worker-names">
+	<div class="modal" style="border-color:#1e40af">
+		<div class="modal-icon">↺</div>
+		<div class="modal-title" style="color:var(--blue)">reset worker names?</div>
+		<div class="modal-body">
+			All registered worker names will be cleared from Redis. Workers will re-register their names automatically on next startup.<br><br>
+			All other data is <strong>not affected</strong>.
+		</div>
+		<div class="modal-actions">
+			<button class="btn btn-cancel" id="cancel-worker-names">cancel</button>
+			<button class="btn btn-blue" id="confirm-worker-names">yes, clear names</button>
+		</div>
+	</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="/static/reset-dashboard.js" defer></script>
+</body>
+</html>

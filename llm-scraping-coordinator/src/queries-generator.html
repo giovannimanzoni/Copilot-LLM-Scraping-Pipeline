@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta content="width=device-width, initial-scale=1.0" name="viewport">
+	<title>Repo Scanner — Dataset Coordinator</title>
+	<link rel="stylesheet" href="/static/queries-generator.css">
+	<script src="/static/theme.js"></script>
+</head>
+<body>
+
+<header>
+	<div class="logo">// repo scanner</div>
+	<nav class="nav">
+		<a class="nav-link" href="/">overview</a>
+		<a class="nav-link" href="/redis">redis</a>
+		<a class="nav-link active" href="/queries-gen">repo scanner</a>
+		<a class="nav-link" href="/reset">reset</a>
+	</nav>
+	<div>
+		<button class="theme-toggle" id="theme-toggle" onclick="__toggleTheme()" title="Toggle theme">&#9728;</button>
+	</div>
+</header>
+
+<main>
+	<div class="page-title">repo scanner</div>
+
+	<div class="gen-card">
+		<div class="gen-card-desc">
+			Scans GitHub for repositories matching the selected language and minimum stars, collects all unique repo URLs,
+			and writes them to <code>input_data/repos_found.txt</code> so the coordinator can seed phase 1.
+		</div>
+
+		<div class="form-row">
+			<div class="form-fields">
+				<div class="field">
+					<label class="field-label" for="language">language</label>
+					<input
+						class="field-input"
+						id="language"
+						placeholder="typescript"
+						type="text"
+						autocomplete="off"
+						spellcheck="false"
+					>
+				</div>
+				<div class="field field-sm">
+					<label class="field-label" for="min-stars">minimum stars</label>
+					<input
+						class="field-input"
+						id="min-stars"
+						type="number"
+						min="0"
+						value="150"
+					>
+				</div>
+			</div>
+			<button class="btn btn-teal" id="btn-generate">scan repos</button>
+		</div>
+	</div>
+
+	<div class="log-area" id="log-area" style="display:none">
+		<div class="log-header">log</div>
+		<div class="log-lines" id="log-lines"></div>
+	</div>
+
+	<div class="result-area" id="result-area" style="display:none">
+		<div class="result-header">
+			<div class="result-meta">
+				<span class="result-label">repos found</span>
+				<span class="result-count" id="result-count"></span>
+			</div>
+		</div>
+		<div style="padding:16px 20px;font-family:var(--mono);font-size:12px;color:var(--text2);line-height:1.7">
+			Written to <code style="font-size:11px;background:var(--bg3);border:1px solid var(--border2);border-radius:3px;padding:1px 5px;color:var(--teal)">input_data/repos_found.txt</code>.
+			Restart the coordinator (or use reset → phase 1) to seed the repos queue, then start phase 1 from the overview.
+		</div>
+	</div>
+
+	<div class="error-area" id="error-area" style="display:none">
+		<div class="error-text" id="error-text"></div>
+	</div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script src="/static/queries-generator.js"></script>
+</body>
+</html>

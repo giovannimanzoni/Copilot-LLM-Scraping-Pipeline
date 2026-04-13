@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(/home/app1/.local/bin/uv run:*)",
+      "Bash(/home/app1/.local/bin/uv tool:*)",
+      "Bash(ls /media/1TB/llm-scraping-main/llm-scraping-worker/envSFTW/bin/python*)",
+      "Bash(find /media/1TB/llm-scraping-main/llm-scraping-worker -name *.py -not -path */envSFTW_/* -not -path */site-packages/*)",
+      "Bash(find /media/1TB/llm-scraping-main/*:*)",
+      "Bash(cd /media/1TB/llm-scraping-main/*:*)",
+      "Bash(hg log:*)",
+      "Bash(hg diff:*)",
+      "Bash(hg cat:*)",
+      "Bash(hg id:*)",
+      "Bash(hg tip:*)"
+    ],
+    "defaultMode": "bypassPermissions"
+  }
+}

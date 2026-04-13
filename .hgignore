@@ -1,0 +1,9 @@
+syntax: glob
+
+llm-scraping*/**
+.idea/**
+.env
+.env.local
+node_modules/**
+.yarnrc
+.npmrc

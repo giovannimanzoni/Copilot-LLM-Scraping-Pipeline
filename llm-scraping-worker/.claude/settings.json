@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(.hg/**)",
+      "Read(.agents/**)",
+      "Read(skills-lock.json)",
+      "Read(envSFTW/**)",
+      "Read(data*/**)"
+    ]
+  }
+}

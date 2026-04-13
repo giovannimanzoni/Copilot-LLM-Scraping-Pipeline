@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta content="width=device-width, initial-scale=1.0" name="viewport">
+	<title>Dataset Coordinator</title>
+	<link href="/static/dashboard.css" rel="stylesheet">
+	<script src="/static/theme.js"></script>
+</head>
+<body>
+
+<header>
+	<div class="logo">// dataset coordinator</div>
+	<nav class="nav">
+		<a class="nav-link active" href="/">overview</a>
+		<a class="nav-link" href="/redis">redis</a>
+		<a class="nav-link" href="/queries-gen">repo scanner</a>
+		<a class="nav-link" href="/reset">reset</a>
+	</nav>
+	<div style="display:flex;align-items:center;gap:12px;">
+		<button class="theme-toggle" id="theme-toggle" onclick="__toggleTheme()" title="Toggle theme">&#9728;</button>
+		<span class="last-update" id="last-update">—</span>
+		<span class="status-label">
+      <span class="status-dot" id="status-dot"></span>
+      <span id="status-text">connecting</span>
+    </span>
+	</div>
+</header>
+
+<main>
+
+	<!-- top three-column layout: metrics + progress + log -->
+	<div class="phase-grid">
+
+		<!-- col 1: metrics -->
+		<div>
+			<div class="section-title">overview</div>
+			<div class="metrics-grid" id="metrics">
+				<div class="metric">
+					<div class="metric-left">
+						<div class="metric-label">total samples</div>
+						<div class="metric-sub">collected</div>
+					</div>
+					<div class="metric-value" id="m-samples">—</div>
+				</div>
+				<div class="metric">
+					<div class="metric-left">
+						<div class="metric-label">stack scanned</div>
+						<div class="metric-sub">items processed</div>
+					</div>
+					<div class="metric-value" id="m-stack-scanned">—</div>
+				</div>
+				<div class="metric">
+					<div class="metric-left">
+						<div class="metric-label">stack samples</div>
+						<div class="metric-sub">collected</div>
+					</div>
+					<div class="metric-value" id="m-stack-samples" style="color:var(--teal)">—</div>
+				</div>
+				<div class="metric">
+					<div class="metric-left">
+						<div class="metric-label">repos done</div>
+						<div class="metric-sub" id="m-repos-sub">of — total</div>
+					</div>
+					<div class="metric-value" id="m-repos-done">—</div>
+				</div>
+				<div class="metric">
+					<div class="metric-left">
+						<div class="metric-label">stack tasks</div>
+						<div class="metric-sub" id="m-stack-sub">remaining</div>
+					</div>
+					<div class="metric-value" id="m-stack">—</div>
+				</div>
+				<div class="metric">
+					<div class="metric-left">
+						<div class="metric-label">active workers</div>
+						<div class="metric-sub" id="m-active-sub">of — total</div>
+					</div>
+					<div class="metric-value" id="m-active">—</div>
+				</div>
+			</div>
+
+			<!-- problematic stack tasks -->
+			<div id="problematic-section" style="display:none;margin-top:24px">
+				<div class="section-title">problematic stack tasks</div>
+				<div id="problematic-list"
+				     style="background:var(--bg2);border:1px solid var(--red-dim);border-radius:6px;padding:12px 16px;font-family:var(--mono);font-size:11px;line-height:2"></div>
+			</div>
+		</div>
+
+		<!-- col 2: progress bars -->
+		<div class="progress-section" style="margin-bottom:0">
+			<div class="section-title">progress</div>
+
+			<div class="progress-item" id="progress-item-phase1">
+				<div class="progress-header" onclick="togglePhase(this)">
+					<span class="progress-name">phase 1 — repo processing</span>
+					<span class="accordion-toggle" onclick="toggleCollapseOnly(event)">▾</span>
+				</div>
+				<div class="progress-item-body">
+					<div
+						style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:5px">
+						repos
+					</div>
+					<div class="bar-track" style="margin-bottom:10px">
+						<div class="bar-fill bar-done" id="bar-repos-done" style="width:0%"></div>
+						<div class="bar-fill bar-active" id="bar-repos-active" style="width:0%"></div>
+						<div class="bar-fill bar-pending" id="bar-repos-pending" style="width:0%"></div>
+					</div>
+					<div style="display:flex;gap:24px;font-family:var(--mono);font-size:11px">
+						<span style="color:var(--text3)"><span id="p2-done"
+						                                       style="font-size:13px;font-weight:500">0</span> done</span>
+						<span style="color:var(--text3)"><span id="p2-active" style="font-size:13px;font-weight:500">0</span> processing</span>
+						<span style="color:var(--text3)"><span id="p2-pending" style="font-size:13px;font-weight:500">0</span> queued</span>
+						<span style="color:var(--red)"><span id="p2-problematic" style="font-size:13px;font-weight:500">0</span> failed</span>
+						<span style="color:var(--text3)"><span id="p2-cancelled" style="font-size:13px;font-weight:500">0</span> cancelled</span>
+						<span id="p2-pct" style="color:var(--text3);margin-left:auto"></span>
+					</div>
+				</div>
+			</div>
+
+			<div class="progress-item" id="progress-item-phase2">
+				<div class="progress-header" onclick="togglePhase(this)">
+					<span class="progress-name">phase 2 — stack (huggingface)</span>
+					<span class="accordion-toggle" onclick="toggleCollapseOnly(event)">▾</span>
+				</div>
+				<div class="progress-item-body">
+					<div
+						style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:5px">
+						queue status
+					</div>
+					<div class="bar-track">
+						<div class="bar-fill bar-done" id="bar-s-done" style="width:0%"></div>
+						<div class="bar-fill bar-active" id="bar-s-assigned" style="width:0%"></div>
+						<div class="bar-fill bar-pending" id="bar-s-pending" style="width:0%"></div>
+						<div class="bar-fill bar-problematic" id="bar-s-problematic" style="width:0%"></div>
+					</div>
+					<div style="margin-top:6px;margin-bottom:12px;display:flex;align-items:center">
+						<div class="progress-stats">
+							<span><span class="dot dot-green"></span><span id="p-s-done">0</span> done</span>
+							<span><span class="dot dot-teal"></span><span id="p-s-assigned">0</span> active</span>
+							<span><span class="dot dot-text3"></span><span id="p-s-pending">0</span> pending</span>
+							<span><span class="dot dot-red"></span><span id="p-s-problematic">0</span> problematic</span>
+						</div>
+						<span id="p-s-queue-pct"
+						      style="font-family:var(--mono);font-size:11px;color:var(--text3);margin-left:auto"></span>
+					</div>
+					<div
+						style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:5px">
+						data throughput
+					</div>
+					<div style="display:flex;gap:24px;font-family:var(--mono);font-size:11px">
+						<span style="color:var(--text3)"><span
+							data-tip="totale item scannerizzati da tutti i worker (stack_scanned)">scanned</span> <span
+							id="p-s-scanned" style="color:var(--text2);font-size:13px;font-weight:500">—</span></span>
+						<span style="color:var(--text3)"><span
+							data-tip="campioni raccolti: batch completati + in corso (stack_samples_done + stack_samples)">samples</span> <span
+							id="p-s-stack-samples" style="color:var(--teal);font-size:13px;font-weight:500">—</span></span>
+					</div>
+				</div>
+			</div>
+			<div class="progress-item" id="progress-item-phase3">
+				<div class="progress-header" onclick="togglePhase(this)">
+					<span class="progress-name">phase 3 — dataset merge</span>
+					<span class="accordion-toggle" onclick="toggleCollapseOnly(event)">▾</span>
+				</div>
+				<div class="progress-item-body">
+					<!-- shared-FS: single task bar -->
+					<div id="merge-shared-display">
+						<div
+							style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:5px">
+							status
+						</div>
+						<div class="bar-track">
+							<div class="bar-fill bar-done" id="bar-merge-done" style="width:0%"></div>
+							<div class="bar-fill bar-active" id="bar-merge-active" style="width:0%"></div>
+						</div>
+						<div style="margin-top:6px;display:flex;gap:16px;font-family:var(--mono);font-size:11px">
+							<span id="p-merge-status" style="color:var(--text3)">idle</span>
+							<span id="p-merge-node" style="color:var(--text3)"></span>
+						</div>
+					</div>
+					<!-- no-shared-FS: per-machine list -->
+					<div id="merge-machines-display" style="display:none">
+						<div
+							style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px">
+							machines
+						</div>
+						<div id="merge-machines-list"
+						     style="font-family:var(--mono);font-size:11px;display:flex;flex-direction:column;gap:4px"></div>
+					</div>
+					<!-- shards loading bar (always visible) -->
+					<div id="merge-shards-bar-section" style="margin-top:10px">
+						<div
+							style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:5px">
+							shards loading
+						</div>
+						<div class="bar-track">
+							<div class="bar-fill bar-done" id="bar-merge-shards" style="width:0%"></div>
+						</div>
+						<div style="margin-top:6px;font-family:var(--mono);font-size:11px;color:var(--text3)">
+							<span id="p-merge-shards-loaded">0</span>/<span id="p-merge-shards-total">?</span> shards loaded
+						</div>
+					</div>
+					<!-- machines merged bar (always visible) -->
+					<div id="merge-machines-bar-section" style="margin-top:10px">
+						<div
+							style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:5px">
+							machines merged
+						</div>
+						<div class="bar-track">
+							<div class="bar-fill bar-done" id="bar-merge-machines" style="width:0%"></div>
+						</div>
+						<div style="margin-top:6px;font-family:var(--mono);font-size:11px;color:var(--text3)">
+							<span id="p-merge-machines-done">0</span>/<span id="p-merge-machines-total">?</span> machines
+						</div>
+					</div>
+					<!-- dataset save_to_disk progress bar -->
+					<div id="merge-save-bar-section" style="margin-top:8px">
+						<div
+							style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:5px">
+							dataset save
+						</div>
+						<div class="bar-track">
+							<div class="bar-fill bar-active" id="bar-merge-save" style="width:0%"></div>
+						</div>
+						<div style="margin-top:6px;font-family:var(--mono);font-size:11px;color:var(--text3)">
+							<span id="p-merge-save-pct">0</span>% saved to disk
+						</div>
+					</div>
+					<!-- post-merge transfer progress -->
+					<div id="merge-transfer-section" style="margin-top:10px;display:none">
+						<div
+							style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px">
+							post-merge
+						</div>
+						<div id="merge-transfer-list"
+						     style="font-family:var(--mono);font-size:11px;display:flex;flex-direction:column;gap:6px"></div>
+					</div>
+				</div>
+			</div>
+		</div> <!-- end col 2: progress -->
+
+		<!-- col 3: activity log + phase control -->
+		<div>
+			<div class="section-title">activity log</div>
+			<div class="log-container" id="log"></div>
+			<div class="section-title" style="margin-top:16px">phase control</div>
+			<button class="phase-btn-base" id="phase-btn" onclick="handlePhaseBtn()">—</button>
+			<a class="phase-download-link" download="final_dataset.zip" href="/merge/download_final" id="download-btn"
+			   style="display:none">⬇ download final_dataset.zip</a>
+			<div id="phase-error-banner"
+			     style="display:none;margin-top:10px;padding:8px 12px;background:var(--red-dim);border:1px solid #7f1d1d;border-radius:5px;font-family:var(--mono);font-size:11px;color:var(--red);">
+				⚠ auto-advance halted — phase completed with errors (see problematic tasks)
+			</div>
+			<label
+				style="display:flex;align-items:center;gap:8px;margin-top:10px;cursor:pointer;font-family:var(--mono);font-size:11px;color:var(--text2);">
+				<input id="auto-advance-chk" onchange="setAutoAdvance(this.checked)" style="accent-color:var(--teal);width:14px;height:14px;cursor:pointer;"
+				       type="checkbox">
+				auto-start next phase when current completes
+			</label>
+			<label
+				style="display:flex;align-items:center;gap:8px;margin-top:8px;cursor:pointer;font-family:var(--mono);font-size:11px;color:var(--text2);">
+				<input checked id="github-enabled-chk" onchange="setGithubEnabled(this.checked)" style="accent-color:var(--teal);width:14px;height:14px;cursor:pointer;"
+				       type="checkbox">
+				phase 1 (github)
+			</label>
+			<label
+				style="display:flex;align-items:center;gap:8px;margin-top:8px;cursor:pointer;font-family:var(--mono);font-size:11px;color:var(--text2);">
+				<input checked id="stack-enabled-chk" onchange="setStackEnabled(this.checked)" style="accent-color:var(--teal);width:14px;height:14px;cursor:pointer;"
+				       type="checkbox">
+				phase 2 (huggingface)
+			</label>
+			<label
+				style="display:flex;align-items:center;gap:8px;margin-top:8px;cursor:pointer;font-family:var(--mono);font-size:11px;color:var(--text2);">
+				<input checked id="merge-enabled-chk" onchange="setMergeEnabled(this.checked)" style="accent-color:var(--teal);width:14px;height:14px;cursor:pointer;"
+				       type="checkbox">
+				phase 3 (merge dataset)
+			</label>
+			<div id="merge-model-section" style="display:none">
+				<label
+					style="display:flex;align-items:center;gap:8px;margin-top:8px;cursor:pointer;font-family:var(--mono);font-size:11px;color:var(--text2);">
+					<input id="merge-shared-fs-chk" onchange="setMergeSharedFs(this.checked)" style="accent-color:var(--teal);width:14px;height:14px;cursor:pointer;"
+					       type="checkbox">
+					shared filesystem (all workers see same data)
+				</label>
+				<div style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+					<span style="font-family:var(--mono);font-size:11px;color:var(--text2);white-space:nowrap">merge node</span>
+					<select id="merge-target-node-sel" onchange="setMergeTargetNode(this.value)" style="
+						background:var(--bg2);color:var(--text2);border:1px solid var(--border);
+						border-radius:4px;padding:3px 6px;font-family:var(--mono);font-size:11px;
+						cursor:pointer;flex:1;min-width:0;
+					">
+						<option value="">random</option>
+					</select>
+				</div>
+			</div>
+		</div>
+
+	</div> <!-- end three-column layout -->
+
+	<!-- workers -->
+	<div class="workers-section">
+		<div class="section-title">workers</div>
+		<div class="workers-grid" id="workers-grid"></div>
+	</div>
+
+</main>
+
+<script defer src="/static/dashboard.js?v=18"></script>
+</body>
+</html>

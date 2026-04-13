@@ -1,0 +1,283 @@
+@import url('common.css');
+
+:root { --accent: var(--teal); }
+
+body { min-height: 100vh; }
+
+main {
+	padding: 24px;
+	max-width: 860px;
+	margin: 0 auto;
+}
+
+.page-title {
+	font-family: var(--mono);
+	font-size: 12px;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: var(--text3);
+	margin-bottom: 24px;
+	padding-bottom: 12px;
+	border-bottom: 1px solid var(--border);
+}
+
+/* Generator card */
+.gen-card {
+	background: var(--bg2);
+	border: 1px solid var(--border);
+	border-radius: 8px;
+	padding: 24px;
+	margin-bottom: 20px;
+}
+
+.gen-card-desc {
+	font-size: 13px;
+	color: var(--text2);
+	line-height: 1.6;
+	margin-bottom: 20px;
+}
+
+.gen-card-desc code {
+	font-family: var(--mono);
+	font-size: 12px;
+	background: var(--bg3);
+	border: 1px solid var(--border2);
+	border-radius: 3px;
+	padding: 1px 5px;
+	color: var(--teal);
+}
+
+/* Form */
+.form-row {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+
+.form-fields {
+	display: flex;
+	align-items: flex-end;
+	gap: 16px;
+	flex-wrap: wrap;
+}
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field-sm { width: 140px; }
+
+.field-label {
+	font-family: var(--mono);
+	font-size: 11px;
+	letter-spacing: 0.08em;
+	color: var(--text3);
+	text-transform: uppercase;
+}
+
+.field-input {
+	background: var(--bg);
+	border: 1px solid var(--border2);
+	border-radius: 5px;
+	color: var(--text);
+	font-family: var(--mono);
+	font-size: 13px;
+	padding: 8px 12px;
+	outline: none;
+	transition: border-color 0.15s;
+	min-width: 180px;
+}
+
+.field-input:focus { border-color: var(--teal); }
+.field-input::placeholder { color: var(--text3); }
+
+/* Buttons */
+.btn {
+	font-family: var(--mono);
+	font-size: 12px;
+	letter-spacing: 0.06em;
+	padding: 9px 22px;
+	border-radius: 5px;
+	border: 1px solid;
+	cursor: pointer;
+	white-space: nowrap;
+	transition: background 0.15s, color 0.15s, opacity 0.15s;
+	flex-shrink: 0;
+}
+
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btn-teal {
+	background: rgba(45, 212, 191, 0.1);
+	color: var(--teal);
+	border-color: rgba(45, 212, 191, 0.3);
+	align-self: flex-start;
+}
+
+.btn-teal:hover:not(:disabled) { background: rgba(45, 212, 191, 0.18); }
+
+.btn-copy {
+	background: var(--bg3);
+	color: var(--text2);
+	border-color: var(--border2);
+	padding: 6px 14px;
+	font-size: 11px;
+}
+
+.btn-copy:hover:not(:disabled) { background: var(--border); color: var(--text); }
+
+/* Log area */
+.log-area {
+	background: var(--bg);
+	border: 1px solid var(--border);
+	border-radius: 8px;
+	overflow: hidden;
+	margin-bottom: 16px;
+}
+
+.log-header {
+	font-family: var(--mono);
+	font-size: 11px;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--text3);
+	padding: 8px 14px;
+	border-bottom: 1px solid var(--border);
+	background: var(--bg2);
+}
+
+.log-lines {
+	padding: 10px 14px;
+	max-height: 180px;
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
+}
+
+.log-line {
+	font-family: var(--mono);
+	font-size: 11px;
+	color: var(--text3);
+	line-height: 1.5;
+}
+
+.log-line::before {
+	content: "› ";
+	color: var(--teal);
+}
+
+/* Result area */
+.result-area {
+	background: var(--bg2);
+	border: 1px solid var(--border);
+	border-radius: 8px;
+	overflow: hidden;
+}
+
+.result-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 12px 16px;
+	border-bottom: 1px solid var(--border);
+}
+
+.result-meta { display: flex; align-items: center; gap: 10px; }
+
+.result-label {
+	font-family: var(--mono);
+	font-size: 11px;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--text3);
+}
+
+.result-count {
+	font-family: var(--mono);
+	font-size: 11px;
+	color: var(--teal);
+	background: rgba(45, 212, 191, 0.1);
+	border: 1px solid rgba(45, 212, 191, 0.2);
+	border-radius: 3px;
+	padding: 2px 7px;
+}
+
+.result-yaml {
+	font-family: var(--mono);
+	font-size: 12px;
+	line-height: 1.65;
+	color: var(--text2);
+	padding: 16px 20px;
+	overflow-x: auto;
+	white-space: pre;
+	margin: 0;
+}
+
+/* Syntax-like colouring via CSS */
+.result-yaml {
+	tab-size: 2;
+}
+
+/* Error */
+.error-area {
+	background: var(--red-dim);
+	border: 1px solid #7f1d1d;
+	border-radius: 8px;
+	padding: 16px 20px;
+}
+
+.error-text {
+	font-family: var(--mono);
+	font-size: 12px;
+	color: var(--red);
+	line-height: 1.55;
+}
+
+/* Spinner inside button */
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.btn-teal.loading::after {
+	content: "";
+	display: inline-block;
+	width: 10px;
+	height: 10px;
+	border: 2px solid currentColor;
+	border-top-color: transparent;
+	border-radius: 50%;
+	animation: spin 0.6s linear infinite;
+	margin-left: 8px;
+	vertical-align: middle;
+}
+
+/* Toast */
+.toast {
+	position: fixed;
+	bottom: 28px;
+	right: 28px;
+	font-family: var(--mono);
+	font-size: 12px;
+	padding: 10px 18px;
+	border-radius: 6px;
+	border: 1px solid;
+	z-index: 200;
+	opacity: 0;
+	transform: translateY(8px);
+	transition: opacity 0.25s, transform 0.25s;
+	pointer-events: none;
+}
+
+.toast.show    { opacity: 1; transform: translateY(0); }
+.toast.success { background: var(--green-dim); color: var(--green); border-color: #166534; }
+.toast.error   { background: var(--red-dim); color: var(--red); border-color: #7f1d1d; }
+
+/* Light mode */
+html[data-theme="light"] .field-input { background: var(--bg3); }
+html[data-theme="light"] .btn-teal {
+	background: rgba(15, 118, 110, 0.12);
+	color: var(--teal);
+	border-color: rgba(15, 118, 110, 0.35);
+}
+html[data-theme="light"] .btn-teal:hover:not(:disabled) { background: rgba(15, 118, 110, 0.22); }
+html[data-theme="light"] .result-count { background: rgba(15, 118, 110, 0.1); border-color: rgba(15, 118, 110, 0.25); }
+html[data-theme="light"] .toast.success { background: #bbf7d0; color: #15803d; border-color: #86efac; }
+html[data-theme="light"] .toast.error   { background: #fecaca; color: #b91c1c; border-color: #f87171; }
+html[data-theme="light"] .error-area    { background: #fecaca; border-color: #f87171; }
+html[data-theme="light"] .gen-card-desc code { background: var(--bg2); }

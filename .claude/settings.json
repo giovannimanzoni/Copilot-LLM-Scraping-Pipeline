@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc:*)",
+      "WebSearch",
+      "Bash(uv run:*)",
+      "Bash(eval:*)",
+      "Bash(conda:*)",
+      "Bash(yarn:*)",
+      "Bash(pip:*)"
+    ],
+    "deny": [
+      "Read(**/.env*)",
+      "Read(**/.hgignore)",
+      "Read(.hg/**)",
+      "Read(.idea/**)",
+      "Read(llm-scraping-coordinator/.hg/**)",
+      "Read(llm-scraping-worker/.hg/**)",
+      "Read(llm-scraping-coordinator/.npmrc)",
+      "Read(llm-scraping-coordinator/.yarnrc)",
+      "Read(llm-scraping-coordinator/input_data/**)",
+      "Read(llm-scraping-coordinator/data/**)",
+      "Read(llm-scraping-worker/data*/**)",
+      "Read(llm-scraping-coordinator/.agents/**)",
+      "Read(llm-scraping-worker/.agents/**)",
+      "Read(llm-scraping-coordinator/dist/**)",
+      "Read(llm-scraping-coordinator/npmrc)",
+      "Read(llm-scraping-worker/npmrc)",
+      "Read(llm-scraping-worker/envSFTW/**)",
+      "Read(llm-scraping-worker/data*/**)"
+    ]
+  },
+  "enabledPlugins": {
+    "frontend-design@claude-plugins-official": true
+  }
+}

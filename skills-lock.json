@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "skills": {
+    "async-python-patterns": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "computedHash": "e2c6c594828cbbf4f0c181eedcf2bd39a2a49b4f087942b295faf36cdc88c423"
+    },
+    "clean-code": {
+      "source": "sickn33/antigravity-awesome-skills",
+      "sourceType": "github",
+      "computedHash": "14ba8e7d8477723eca6d48a79a1924337f4a1f5f1c7ab9b0a7acc073268ecd5a"
+    },
+    "dataverse-python-advanced-patterns": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "computedHash": "dd4f65b62c3b702c7dfc14a4e19caaa9ab3515e87a1d7e110482d9ba19469bd0"
+    },
+    "dataverse-python-production-code": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "computedHash": "7299422fdb42dcede45a761921656a6450c476388731288a6e5afb0303f1d25d"
+    },
+    "documentation-writer": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "computedHash": "ee53d65b163cd7eb953a930c95841cfe398cc2c0bd24c06508bbaa07c432be35"
+    },
+    "find-skills": {
+      "source": "vercel-labs/skills",
+      "sourceType": "github",
+      "computedHash": "d31e234f0c90694a670222cdd1dafa853e051d7066beda389f1097c22dadd461"
+    },
+    "fine-tuning-expert": {
+      "source": "jeffallan/claude-skills",
+      "sourceType": "github",
+      "computedHash": "a95c66df80cdce51a7c132c7fe3c5f9bc848358762d39892a873ee9e456f6392"
+    },
+    "nodejs-backend-patterns": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "computedHash": "c6a99966c2565acc388e574039127abc770bb9a3338be761e421e16f023f702b"
+    },
+    "python-anti-patterns": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "computedHash": "5a6d1c378bbfc859a12fe08dda1e2b856af725ff3cc46ee38cea8bd03736abdb"
+    },
+    "python-code-style": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "computedHash": "35ed0c437f33462187b0a89da8e5bfe9ac259dbc8731257c5445f1a5e1229acf"
+    },
+    "python-design-patterns": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "computedHash": "f263ed30e7627f1f22aea99f0f098b73a9f3b5f1c9ea36d3a31a787eacf2e07e"
+    },
+    "python-error-handling": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "computedHash": "05d1fd2762d38e6afac8533e28554038e27fc8620b2df63f1e806de3c4d77fe3"
+    },
+    "python-performance-optimization": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "computedHash": "1a7009e7e16fd08c201f4a527a44d4f0d9d1d892b15b92ab3492624b23be22b8"
+    },
+    "python-project-structure": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "computedHash": "2f4f560964af8ecad4d54666c044baa54671d0abd1136c848b539befe24db170"
+    },
+    "sentry-python-sdk": {
+      "source": "getsentry/sentry-for-ai",
+      "sourceType": "github",
+      "computedHash": "ca646fbfd25ebb69e41f81b0a5c19a77d77ed8efadab62d0e872840eccafa4b3"
+    },
+    "typescript-advanced-types": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "computedHash": "3a3be8c925f96ac4e1280db28a01677e7ca5197f3792de2bbf35ab3bb324b6dd"
+    }
+  }
+}

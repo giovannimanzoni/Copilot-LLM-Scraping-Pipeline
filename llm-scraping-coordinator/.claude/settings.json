@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc:*)",
+      "WebSearch",
+      "Bash(uv run:*)"
+    ],
+		"deny": [
+			"Read(.hg/**)",
+			"Read(**/.env*)",
+			"Read(**/.hgignore)",
+			"Read(.npmrc)",
+			"Read(.yarnrc)",
+			"Read(input_data/**)",
+			"Read(data/**)",
+			"Read(.agents/**)",
+			"Read(dist/**)",
+			"Read(npmrc)"
+		]
+  }
+}

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta content="width=device-width, initial-scale=1.0" name="viewport">
+	<title>Redis Inspector</title>
+	<link rel="stylesheet" href="/static/redis-dashboard.css">
+	<script src="/static/theme.js"></script>
+</head>
+<body>
+
+<header>
+	<div class="logo">// redis inspector</div>
+	<nav class="nav">
+		<a class="nav-link" href="/">overview</a>
+		<a class="nav-link active" href="/redis">redis</a>
+		<a class="nav-link" href="/queries-gen">repo scanner</a>
+		<a class="nav-link" href="/reset">reset</a>
+	</nav>
+	<div style="display:flex;align-items:center;gap:12px;">
+		<button class="theme-toggle" id="theme-toggle" onclick="__toggleTheme()" title="Toggle theme">&#9728;</button>
+		<span class="last-update" id="last-update">—</span>
+		<span class="status-label">
+			<span class="status-dot" id="status-dot"></span>
+			<span id="status-text">connecting</span>
+		</span>
+	</div>
+</header>
+
+<main>
+
+	<!-- keys overview -->
+	<div class="section">
+		<div class="section-title" onclick="toggle('keys-overview')">
+			key overview
+			<span class="toggle" id="toggle-keys-overview">▼</span>
+		</div>
+		<div class="collapsible" id="keys-overview">
+			<div class="keys-grid" id="keys-grid">
+				<!-- populated by JS -->
+			</div>
+		</div>
+	</div>
+
+	<!-- repos assigned -->
+	<div class="section">
+		<div class="section-title" onclick="toggle('repos-assigned-body')">
+			<span class="tag tag-zset">ZSET</span>
+			{repos}:assigned
+			<span class="count-badge badge-zset" id="repos-assigned-count">—</span>
+			<span class="toggle" id="toggle-repos-assigned-body">▼</span>
+		</div>
+		<div class="collapsible" id="repos-assigned-body">
+			<div class="table-wrap" style="max-height:200px;overflow-y:auto">
+				<table class="data-table">
+					<thead><tr><th>repo</th><th>assigned at</th><th>age</th></tr></thead>
+					<tbody id="repos-assigned-table"></tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+
+	<!-- repos pending sample -->
+	<div class="section">
+		<div class="section-title" onclick="toggle('repos-pending-body')">
+			<span class="tag tag-set">SET</span>
+			{repos}:pending
+			<span class="count-badge badge-set" id="repos-pending-count">—</span>
+			<span class="toggle" id="toggle-repos-pending-body">▼</span>
+		</div>
+		<div class="collapsible" id="repos-pending-body">
+			<div id="repos-pending-chips" class="chip-list" style="max-height:200px;overflow-y:auto"></div>
+		</div>
+	</div>
+
+	<!-- repos done count -->
+	<div class="section">
+		<div class="section-title">
+			<span class="tag tag-set">SET</span>
+			{repos}:done
+			<span class="count-badge badge-set" id="repos-done-count">—</span>
+			<span style="color:var(--text3);font-size:10px;margin-left:4px">(count only)</span>
+		</div>
+	</div>
+
+	<!-- repos cancelled sample -->
+	<div class="section">
+		<div class="section-title" onclick="toggle('repos-cancelled-body')">
+			<span class="tag tag-set">SET</span>
+			{repos}:cancelled
+			<span class="count-badge badge-set" id="repos-cancelled-count">—</span>
+			<span class="refresh-note">sample of up to 50</span>
+			<span class="toggle" id="toggle-repos-cancelled-body">▼</span>
+		</div>
+		<div class="collapsible" id="repos-cancelled-body">
+			<div id="repos-cancelled-chips" class="chip-list"></div>
+		</div>
+	</div>
+
+	<!-- stack assigned -->
+	<div class="section">
+		<div class="section-title" onclick="toggle('stack-assigned-body')">
+			<span class="tag tag-zset">ZSET</span>
+			{stack}:assigned + assigned_tasks
+			<span class="count-badge badge-zset" id="stack-assigned-count">—</span>
+			<span class="toggle" id="toggle-stack-assigned-body">▼</span>
+		</div>
+		<div class="collapsible" id="stack-assigned-body">
+			<div class="table-wrap">
+				<table class="data-table">
+					<thead><tr><th>key</th><th>assigned at</th><th>age</th><th>task</th></tr></thead>
+					<tbody id="stack-assigned-table"></tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+
+	<!-- stack pending sample -->
+	<div class="section">
+		<div class="section-title" onclick="toggle('stack-pending-body')">
+			<span class="tag tag-list">LIST</span>
+			{stack}:pending
+			<span class="count-badge badge-list" id="stack-pending-count">—</span>
+			<span class="refresh-note">all items</span>
+			<span class="toggle" id="toggle-stack-pending-body">▼</span>
+		</div>
+		<div class="collapsible" id="stack-pending-body">
+			<div class="table-wrap" style="max-height:200px;overflow-y:auto">
+				<table class="data-table">
+					<thead><tr><th>#</th><th>lang</th><th>batch_index</th><th>total_batches</th></tr></thead>
+					<tbody id="stack-pending-table"></tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+
+	<!-- stack done -->
+	<div class="section">
+		<div class="section-title" onclick="toggle('stack-done-body')">
+			<span class="tag tag-set">SET</span>
+			{stack}:done
+			<span class="count-badge badge-set" id="stack-done-count">—</span>
+			<span class="toggle" id="toggle-stack-done-body">▼</span>
+		</div>
+		<div class="collapsible" id="stack-done-body">
+			<div id="stack-done-chips" class="chip-list"></div>
+		</div>
+	</div>
+
+	<!-- stack problematic -->
+	<div class="section">
+		<div class="section-title" onclick="toggle('stack-problematic-body')">
+			<span class="tag tag-set">SET</span>
+			{stack}:problematic + problematic_tasks
+			<span class="count-badge" id="stack-problematic-count" style="background:var(--red-dim);color:var(--red);border:1px solid #7f1d1d">—</span>
+			<span class="toggle" id="toggle-stack-problematic-body">▼</span>
+		</div>
+		<div class="collapsible" id="stack-problematic-body">
+			<div id="stack-problematic-content"></div>
+		</div>
+	</div>
+
+	<!-- node heartbeats -->
+	<div class="section">
+		<div class="section-title" onclick="toggle('nodes-body')">
+			<span class="tag tag-hash">HASH</span>
+			node stats + heartbeats
+			<span class="toggle" id="toggle-nodes-body">▼</span>
+		</div>
+		<div class="collapsible" id="nodes-body">
+			<div class="hb-grid" id="nodes-hb-grid"></div>
+			<div style="margin-top:12px">
+				<div class="table-wrap">
+					<table class="data-table">
+						<thead><tr><th>node</th><th>ttl</th><th>samples</th><th>repos_done</th><th>repos_failed</th><th>stack_samples</th><th>current_repo</th><th>current_stack</th></tr></thead>
+						<tbody id="nodes-table"></tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</main>
+
+<script src="/static/redis-dashboard.js" defer></script>
+</body>
+</html>

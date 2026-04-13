@@ -469,3 +469,13 @@ Disabled merge-enabled-chk (phase 3 checkbox) when _mergePhaseDone in applyPhase
 
 ## 2026-04-13 09:20
 Fixed: POST /reset/phase/merge and POST /reset/all both now delete K.merge_transfer ('merge:transfer' HASH). Previously, post-merge transfer progress bars persisted after reset because the key was not included in the delete list.
+
+## 2026-04-13 12:42
+Removed STACK_BATCH_COUNT from coordinator docs (CLAUDE.md Key Modules table + Environment section, README.md Configuration table + Stack task queue description). The variable was already removed from code in a previous session.
+
+## 2026-04-13 15:39
+Added FILE_EXTENSIONS env var to coordinator (config.mts, routes/worker.mts /config endpoint, README, CLAUDE.md). Workers now fetch extensions from /config instead of using hardcoded LANG_EXTENSIONS. Removed LANG_EXTENSIONS from filtering.py. Updated worker README, CLAUDE.md.
+
+## 2026-04-13 15:39
+Removed LANG_EXTENSIONS from filtering.py. Added fetch_file_extensions() to coordinator.py. clone_and_extract() now takes file_extensions param; collect_github() fetches extensions from coordinator at startup. Updated CLAUDE.md and README.md.
+

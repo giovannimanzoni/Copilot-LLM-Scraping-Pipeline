@@ -11,8 +11,8 @@ import sentry_sdk
 
 from worker.checkpoint import append_ckpt, ckpt_exists, ckpt_path
 from worker.config import CLONE_TIMEOUT, DATA_DIR1, GITHUB_TOKEN, TMPFS_DIR, log
-from worker.coordinator import coord_get, coord_post, get_fleet_status, send_heartbeat, wait_for_phase
-from worker.filtering import LANG_EXTENSIONS, is_valid_code
+from worker.coordinator import coord_get, coord_post, fetch_file_extensions, get_fleet_status, send_heartbeat, wait_for_phase
+from worker.filtering import is_valid_code
 
 
 def _device_path(path: Path) -> str:
@@ -52,7 +52,7 @@ def _log_clone_error(repo_full_name: str, reason: str) -> None:
         log.warning(f"  [error.log] failed to write: {exc}")
 
 
-def clone_and_extract(repo_full_name: str) -> list[dict] | str:
+def clone_and_extract(repo_full_name: str, file_extensions: list[str]) -> list[dict] | str:
     """Returns list of samples on success (possibly empty), or an error reason string on failure."""
     log.info(f"  [clone] Cloning {repo_full_name}...")
     if not TMPFS_DIR.is_mount():
@@ -115,26 +115,25 @@ def clone_and_extract(repo_full_name: str) -> list[dict] | str:
             skip_dirs = {"node_modules", "dist", ".git", "build", "coverage", "vendor"}
             samples = []
 
-            for lang, exts in LANG_EXTENSIONS.items():
-                for path in clone_dir.rglob("*"):
-                    if any(skip in path.parts for skip in skip_dirs):
+            for path in clone_dir.rglob("*"):
+                if any(skip in path.parts for skip in skip_dirs):
+                    continue
+                if ".min." in path.name:
+                    continue
+                if not any(path.name.endswith(ext) for ext in file_extensions):
+                    continue
+                try:
+                    if path.stat().st_size > 100_000:
                         continue
-                    if ".min." in path.name:
-                        continue
-                    if not any(path.name.endswith(ext) for ext in exts):
-                        continue
-                    try:
-                        if path.stat().st_size > 100_000:
-                            continue
-                        content = path.read_text(encoding="utf-8", errors="ignore")
-                        if is_valid_code(content, lang):
-                            samples.append({
-                                "content": content,
-                                "source": f"github:{repo_full_name}",
-                                "lang": lang,
-                            })
-                    except Exception:
-                        pass
+                    content = path.read_text(encoding="utf-8", errors="ignore")
+                    if is_valid_code(content, "typescript"):
+                        samples.append({
+                            "content": content,
+                            "source": f"github:{repo_full_name}",
+                            "lang": "typescript",
+                        })
+                except Exception:
+                    pass
 
             return samples
 
@@ -166,6 +165,9 @@ def collect_github(node_id: int, checkpoints_dir: Path) -> None:
     if int(fleet_status.get("phase", 1)) > 1 and ckpt_exists(ckpt_name, checkpoints_dir):
         log.info(f"  [node{node_id}] Coordinator already past phase 1 — skipping repo collection (checkpoint present)")
         return
+
+    file_extensions = fetch_file_extensions()
+    log.info(f"  [node{node_id}] File extensions to collect: {file_extensions}")
 
     # phase 1: cloning
     log.info(f"  [node{node_id}] Phase 1: cloning repos...")
@@ -204,7 +206,7 @@ def collect_github(node_id: int, checkpoints_dir: Path) -> None:
                 continue
 
             send_heartbeat(node_id)
-            result = clone_and_extract(repo)
+            result = clone_and_extract(repo, file_extensions)
 
             if isinstance(result, str):
                 log.warning(f"  [fail] {repo} — {result}")

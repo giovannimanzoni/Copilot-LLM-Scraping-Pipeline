@@ -1,6 +1,6 @@
 === Saved Context ===
-  current_task: DONE: Final Check done.  (saved: 2026-04-13T12:15:25.724295)
-  next_task: none  (saved: 2026-04-13T12:15:25.924941)
+  current_task: DONE: Remove hardcoded LANG_EXTENSIONS, fetch file_extensions from coordinator /config  (saved: 2026-04-13T15:39:52.540378)
+  next_task: none  (saved: 2026-04-13T15:39:52.728803)	
 
 === decisions.md ===
 
@@ -56,3 +56,13 @@ Fixed: POST /reset/phase/merge and POST /reset/all both now delete K.merge_trans
 
 ## 2026-04-13 12:15
 DONE: Final Check done.
+
+## 2026-04-13 12:42
+Removed STACK_BATCH_COUNT from coordinator docs (CLAUDE.md Key Modules table + Environment section, README.md Configuration table + Stack task queue description). The variable was already removed from code in a previous session.
+
+## 2026-04-13 15:39
+Added FILE_EXTENSIONS env var to coordinator (config.mts, routes/worker.mts /config endpoint, README, CLAUDE.md). Workers now fetch extensions from /config instead of using hardcoded LANG_EXTENSIONS. Removed LANG_EXTENSIONS from filtering.py. Updated worker README, CLAUDE.md.
+
+## 2026-04-13 15:39
+Removed LANG_EXTENSIONS from filtering.py. Added fetch_file_extensions() to coordinator.py. clone_and_extract() now takes file_extensions param; collect_github() fetches extensions from coordinator at startup. Updated CLAUDE.md and README.md.
+

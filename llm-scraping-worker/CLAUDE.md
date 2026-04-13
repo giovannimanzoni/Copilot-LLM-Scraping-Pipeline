@@ -49,7 +49,7 @@ worker/
   __main__.py          ← entry point
   config.py            ← env vars, logging, sentry init, path constants
   coordinator.py       ← HTTP client, heartbeat, fleet state
-  filtering.py         ← is_valid_code, dedup, GENERATED_SIGNALS, LANG_EXTENSIONS
+  filtering.py         ← is_valid_code, dedup, GENERATED_SIGNALS
   checkpoint.py        ← save_ckpt, load_ckpt, append_ckpt (atomic JSONL)
   streaming.py         ← stream_with_timeout, StackProgress, stack_progress_reporter
   fim.py               ← to_fim
@@ -68,7 +68,8 @@ worker/
 | `coord_get(path)` / `coord_post(path, data)`  | `coordinator`               | Coordinator HTTP client with exponential-backoff retry                                      |
 | `collect_the_stack()`                         | `collectors.stack`          | HuggingFace streaming pipeline (shard-based partitioning)                                   |
 | `collect_github()`                            | `collectors.github`         | GitHub search + clone pipeline (coordinator-queued repos)                                   |
-| `clone_and_extract(repo)`                     | `collectors.github`         | Shallow-clones to tmpfs, extracts `.ts`/`.mts`/`.cts`, returns samples or `None` on failure |
+| `clone_and_extract(repo, file_extensions)`    | `collectors.github`         | Shallow-clones to tmpfs, extracts files matching coordinator-configured extensions, returns samples or error string on failure |
+
 | `to_fim(code)`                                | `fim`                       | Formats code into Fill-in-the-Middle format for training                                    |
 | `stream_with_timeout(iterable, item_timeout)` | `streaming`                 | Wraps any iterable with a per-item deadline via background thread                           |
 | `save_ckpt` / `load_ckpt` / `append_ckpt`    | `checkpoint`                | Atomic JSONL checkpoint read/write                                                          |

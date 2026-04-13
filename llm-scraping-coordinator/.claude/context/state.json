@@ -1,10 +1,10 @@
 {
   "current_task": {
-    "value": "DONE: Fiinal check done.",
-    "updated": "2026-04-13T12:15:25.724295"
+    "value": "DONE: Remove hardcoded LANG_EXTENSIONS, fetch file_extensions from coordinator /config",
+    "updated": "2026-04-13T15:39:52.540378"
   },
   "next_task": {
     "value": "none",
-    "updated": "2026-04-13T12:15:25.924941"
+    "updated": "2026-04-13T15:39:52.728803"
   }
 }

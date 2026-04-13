@@ -352,3 +352,7 @@ Fixed: DATA_DIR1.glob('dataset_node*/') → glob('dataset_node*') — trailing s
 
 ## 2026-04-13 11:59
 Fixed: all post-merge idle loops (run_post_merge x4 + multi_worker_main x1) now call send_heartbeat(node_id, 'idle') every 60s. Previously bare time.sleep(60) caused heartbeat key (TTL=300s) to expire, making coordinator watchdog flag workers as DEAD after 8+ min.
+
+## 2026-04-13 15:39
+Removed LANG_EXTENSIONS from filtering.py. Added fetch_file_extensions() to coordinator.py. clone_and_extract() now takes file_extensions param; collect_github() fetches extensions from coordinator at startup. Updated CLAUDE.md and README.md.
+

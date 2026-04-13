@@ -1,7 +1,7 @@
 import Router from "@koa/router";
 import {z} from "zod";
 
-import {THE_STACK_LANGUAGES} from "../config.mjs";
+import {FILE_EXTENSIONS, THE_STACK_LANGUAGES} from "../config.mjs";
 import {log, warn} from "../logger.mjs";
 import {redisClient as redis} from "../redis.mjs";
 import {K} from "../redis-keys.mjs";
@@ -10,7 +10,7 @@ import {validate} from "../validate.mjs";
 export const workerRouter: Router = new Router();
 
 workerRouter.get("/config", async (ctx) => {
-	ctx.body = {stack_languages: THE_STACK_LANGUAGES};
+	ctx.body = {stack_languages: THE_STACK_LANGUAGES, file_extensions: FILE_EXTENSIONS};
 });
 
 workerRouter.post("/worker/register", async (ctx) => {

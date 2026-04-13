@@ -1,6 +1,6 @@
 === Saved Context ===
-  current_task: DONE: Fix idle loops missing heartbeats in merge.py (4 loops) and main.py (1 loop)  (saved: 2026-04-13T11:59:30.325225)
-  next_task: none  (saved: 2026-04-13T11:59:30.650886)
+  current_task: DONE: Remove hardcoded LANG_EXTENSIONS, fetch file_extensions from coordinator /config  (saved: 2026-04-13T15:39:58.023932)
+  next_task: none  (saved: 2026-04-13T15:39:58.220571)
 
 === decisions.md ===
 
@@ -44,3 +44,7 @@ Fixed: DATA_DIR1.glob('dataset_node*/') → glob('dataset_node*') — trailing s
 
 ## 2026-04-13 11:59
 Fixed: all post-merge idle loops (run_post_merge x4 + multi_worker_main x1) now call send_heartbeat(node_id, 'idle') every 60s. Previously bare time.sleep(60) caused heartbeat key (TTL=300s) to expire, making coordinator watchdog flag workers as DEAD after 8+ min.
+
+## 2026-04-13 15:39
+Removed LANG_EXTENSIONS from filtering.py. Added fetch_file_extensions() to coordinator.py. clone_and_extract() now takes file_extensions param; collect_github() fetches extensions from coordinator at startup. Updated CLAUDE.md and README.md.
+

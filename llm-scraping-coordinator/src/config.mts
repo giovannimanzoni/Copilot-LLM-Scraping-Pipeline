@@ -8,6 +8,12 @@ export const THE_STACK_LANGUAGES: readonly string[] = _stackLangsEnv
 	.map((s) => s.trim().toLowerCase())
 	.filter(Boolean);
 
+const _fileExtensionsEnv = process.env.FILE_EXTENSIONS ?? ".ts,.mts,.cts";
+export const FILE_EXTENSIONS: readonly string[] = _fileExtensionsEnv
+	.split(",")
+	.map((s) => s.trim().toLowerCase())
+	.filter(Boolean);
+
 export const STACK_TASKS = [
 	{lang: "typescript", data_dir: "data/typescript", target_lang: "typescript"},
 ] as const;

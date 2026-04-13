@@ -84,19 +84,16 @@ src/
   or by `POST /fleet/phase/start`.
 - **`fleet:state` missing = running** — do not rely on its presence; treat absence as `"running"`.
 - **Port is 3981** — hardcoded in `config.mts`, not overridable via env.
-- **`dev` script in `package.json` references `src/index.mts`** which does not exist — use `start` instead.
 
-## VCS
-
-Mercurial (`.hg/`), not Git. Use `hg` commands.
 
 ## Gotchas
 
-- `package.json` `dev` script references `src/index.mts` (does not exist) — use `start` instead
-- ESLint config is private (`@thedoctorweb_agency/eslint-config-tdw-be`); Yarn proxies through `yarnproxy.lan:4873`
-- Sentry (`src/instrument.mts`) patches HTTPS to disable cert verification for `bugsink.lan`
+- Sentry (`src/instrument.mts`) patches HTTPS to disable cert verification for local BugSink instance.
 
 ## Environment
 
-Config in `.env`. Key variables: `STACK_BATCH_COUNT` (default 2000), `REDIS_IS_CLUSTER`,
-`REDIS_DB{1,2,3}_HOST/PORT`, `REDIS_USERNAME`, `REDIS_PASSWORD`, `REDIS_KEY`, `SENTRY_DSN`, `SENTRY_ENVIRONMENT`.
+Config in `.env`. Key variables: `REDIS_IS_CLUSTER`,
+`REDIS_DB{1,2,3}_HOST/PORT`, `REDIS_USERNAME`, `REDIS_PASSWORD`, `REDIS_KEY`, `SENTRY_DSN`, `SENTRY_ENVIRONMENT`,
+`THE_STACK_LANGUAGES` (comma-separated Stack languages, default `typescript`),
+`FILE_EXTENSIONS` (comma-separated file extensions for GitHub collection, default `.ts,.mts,.cts`).
+

@@ -78,9 +78,11 @@ the repo marked problematic. Every clone failure (exit code, timeout, or excepti
 
 ### Phase 2 — Stack scraping (HuggingFace)
 
-Workers claim batches from `bigcode/the-stack` (`GET /stack/next/:nodeId`). Each batch carries `{batch_index,
-total_batches}` so workers process disjoint slices (`item_id % total_batches === batch_index`). Workers stream the
-HuggingFace dataset shard-by-shard and report completion (`POST /stack/done`).
+Workers claim individual repos (`GET /repos/next/:nodeId`), shallow-clone to tmpfs (`/mnt/tmpfs_repos`) via
+`git clone --depth=1`, extract files matching the extensions configured in the coordinator's `FILE_EXTENSIONS` env var
+(default `.ts,.mts,.cts`), delete the clone, and report results (`POST /repos/done` or `/repos/fail`).
+Phase 2 is complete when no repos remain pending or assigned.
+
 
 **Where the task count comes from:** at reset/seed time the coordinator calls the HuggingFace Hub API
 (`/api/datasets/bigcode/the-stack/tree/main/data/typescript`) and counts the `.parquet` shard files present in that

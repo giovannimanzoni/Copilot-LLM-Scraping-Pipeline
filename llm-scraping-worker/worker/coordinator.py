@@ -158,6 +158,12 @@ def fetch_stack_languages() -> frozenset[str]:
     return frozenset(data.get("stack_languages", ["typescript"]))
 
 
+def fetch_file_extensions() -> list[str]:
+    """Fetch the list of file extensions to collect from the coordinator."""
+    data = coord_get("/config")
+    return list(data.get("file_extensions", [".ts", ".mts", ".cts"]))
+
+
 def get_fleet_status() -> dict:
     """Returns {state, phase} from the coordinator (fail-open defaults on error)."""
     try:

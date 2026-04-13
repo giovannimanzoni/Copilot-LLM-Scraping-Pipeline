@@ -1,10 +1,10 @@
 {
   "current_task": {
-    "value": "DONE: Fix idle loops missing heartbeats in merge.py (4 loops) and main.py (1 loop)",
-    "updated": "2026-04-13T11:59:30.325225"
+    "value": "DONE: Remove hardcoded LANG_EXTENSIONS, fetch file_extensions from coordinator /config",
+    "updated": "2026-04-13T15:39:58.023932"
   },
   "next_task": {
     "value": "none",
-    "updated": "2026-04-13T11:59:30.650886"
+    "updated": "2026-04-13T15:39:58.220571"
   }
 }

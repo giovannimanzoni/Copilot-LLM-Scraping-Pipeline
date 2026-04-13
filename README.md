@@ -100,6 +100,3 @@ See each subproject's README for setup, configuration, and API reference.
 5. **Collect output** — when all phases complete, the coordinator uploads `data/final_dataset.tar.zst`
    and self-terminates
 
-## VCS
-
-Both subprojects use **Mercurial** (`.hg/`), not Git.
